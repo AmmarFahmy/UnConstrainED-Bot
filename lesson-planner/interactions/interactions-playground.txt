@@ -1,0 +1,58 @@
+'Title: Confidence Intervals
+
+Grade Level: 12
+
+Subject: Statistics
+
+Duration: 45 minutes
+
+Objectives:
+1. Students will be able to define and understand the concept of confidence intervals.
+2. Students will be able to calculate confidence intervals for population means.
+3. Students will be able to interpret and communicate the results of confidence intervals in context.
+
+Prerequisite Knowledge:
+- Students should have a basic understanding of sampling techniques and population parameters.
+- Students should be familiar with the concept of the normal distribution.
+
+Materials:
+- Whiteboard and markers
+- Calculators
+- Handout with practice problems
+
+Lesson Plan:
+
+1. Introduction (5 minutes)
+- Begin by reviewing the concept of sampling and population parameters.
+- Explain that confidence intervals provide an estimate of where the true population parameter lies based on sample data.
+- State the objectives for the lesson.
+
+2. Definition and Calculation of Confidence Intervals (15 minutes)
+- Define confidence interval as a range of values within which the true population parameter is estimated to lie.
+- Explain the formula for calculating confidence intervals for population means: CI = x̄ ± z * (σ/√n), where x̄ is the sample mean, z is the z-score corresponding to the desired level of confidence, σ is the population standard deviation, and n is the sample size.
+- Model the calculation of confidence intervals using a sample problem on the whiteboard.
+- Provide clear samples and ask students to calculate confidence intervals for given sample data.
+
+3. Interpreting Confidence Intervals (15 minutes)
+- Discuss the interpretation of confidence intervals in context. Emphasize that a confidence interval does not provide a single point estimate of the population parameter but rather a range of plausible values.
+- Give examples of how to interpret confidence intervals, such as "We are 95% confident that the true population mean falls within this range."
+- Engage students in a discussion about the implications of different levels of confidence on the width of the confidence interval.
+
+4. Checking Understanding (5 minutes)
+- Pose questions to students to check their understanding of the concept of confidence intervals.
+- Ask students to explain the steps involved in calculating a confidence interval.
+- Correct any misconceptions and provide additional clarification if needed.
+
+5. Practice (5 minutes)
+- Distribute a handout with practice problems for students to solve independently or in pairs.
+- Circulate the classroom to provide assistance and address any questions or difficulties.
+
+6. Conclusion (5 minutes)
+- Summarize the main points of the lesson.
+- Remind students of the importance of confidence intervals in statistical analysis.
+- Assign homework to reinforce the concepts learned in class.
+
+Assessment:
+- Monitor students\' participation and engagement during class discussions and activities.
+- Review students\' calculations and interpretations of confidence intervals on the handout.
+- Assign homework that requires students to calculate and interpret confidence intervals for given data sets.'

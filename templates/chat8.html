@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chatbot</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
+    <style>
+        .chat-message {
+            margin: 5px;
+            padding: 5px;
+            border: 1px solid #ccc;
+        }
+        .button {
+            margin-left: 10px;
+            cursor: pointer;
+            color: blue;
+            text-decoration: underline;
+        }
+        #export-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <button id="export-btn" onclick="exportToPDF()">Export to PDF</button>
+    <div id="chat-container">
+        <div id="chat-box"></div>
+        <input type="text" id="user-input" placeholder="Type a message...">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script>
+        function sendMessage() {
+            let userInput = document.getElementById('user-input');
+            let message = userInput.value.trim();
+            if (message) {
+                addMessageToChat('You', message);
+                userInput.value = '';
+                postMessage(message);
+            }
+        }
+
+        function postMessage(message, expand = false, paragraphIndex = null) {
+            fetch('/ask', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ message, expand, paragraphIndex })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (expand) {
+                    updateParagraph(paragraphIndex, data.response);
+                } else {
+                    addMessageToChat('Bot', data.response);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function addMessageToChat(sender, message) {
+            let chatBox = document.getElementById('chat-box');
+            let messageDiv = document.createElement('div');
+            messageDiv.classList.add('chat-message');
+
+            if (sender === 'Bot') {
+                let paragraphs = message.split('\n');
+                paragraphs.forEach((paragraph, index) => {
+                    if (paragraph.trim().length > 0) {
+                        let paraDiv = document.createElement('div');
+                        paraDiv.id = 'paragraph-' + index;
+                        paraDiv.textContent = paragraph;
+
+                        let expandBtn = createButton('Expand', function() { expandParagraph(index, paragraph); });
+                        let contractBtn = createButton('Contract', function() { contractParagraph(index, paragraph); });
+
+                        paraDiv.appendChild(expandBtn);
+                        paraDiv.appendChild(contractBtn);
+                        messageDiv.appendChild(paraDiv);
+                    }
+                });
+            } else {
+                messageDiv.textContent = sender + ': ' + message;
+            }
+
+            chatBox.appendChild(messageDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function createButton(text, onClickFunction) {
+            let button = document.createElement('span');
+            button.classList.add('button');
+            button.textContent = text;
+            button.onclick = onClickFunction;
+            return button;
+        }
+
+        function expandParagraph(paragraphIndex, paragraphText) {
+            postMessage(paragraphText, true, paragraphIndex);
+        }
+
+        function contractParagraph(paragraphIndex, originalText) {
+            updateParagraph(paragraphIndex, originalText);
+        }
+
+        function updateParagraph(paragraphIndex, newText) {
+            let paraDiv = document.getElementById('paragraph-' + paragraphIndex);
+            if (paraDiv) {
+                paraDiv.childNodes[0].nodeValue = newText;
+            }
+        }
+
+        function exportToPDF() {
+            var doc = new jspdf.jsPDF();
+            var chatBox = document.getElementById('chat-box');
+            var lineHeight = 10;
+            var margin = 20;
+            var maxLineHeight = doc.internal.pageSize.height - margin;
+            var textLines = doc.splitTextToSize(chatBox.innerText, doc.internal.pageSize.width - 2 * margin);
+
+            let currentHeight = margin;
+            textLines.forEach(function(line){
+                if (currentHeight + lineHeight > maxLineHeight) {
+                    doc.addPage();
+                    currentHeight = margin;
+                }
+                doc.text(line, margin, currentHeight);
+                currentHeight += lineHeight;
+            });
+
+            doc.save('chat.pdf');
+        }
+    </script>
+</body>
+</html>
