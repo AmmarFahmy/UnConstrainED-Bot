@@ -31,8 +31,10 @@ from langchain.agents.openai_functions_agent.base import OpenAIFunctionsAgent
 from langchain.prompts import MessagesPlaceholder
 from langchain.schema.messages import SystemMessage
 from langchain.agents import AgentExecutor
+import os
+load_dotenv()
 
-llm = ChatOpenAI(openai_api_key= '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', model_name="gpt-4")
+llm = ChatOpenAI(openai_api_key= os.getenv("OPENAI_API_KEY"), model_name="gpt-4")
 
 from langchain.embeddings import HuggingFaceEmbeddings
 
@@ -46,7 +48,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import FAISS
 from langchain.document_loaders import PyPDFLoader
 
-DATA_PATH = r"rubric-generator\resources"
+DATA_PATH = r"E:\Pycharm Projects\EPTech\UnconstrainED\rubric-generator\resources"
 
 loader = DirectoryLoader(DATA_PATH, glob='*.pdf',loader_cls=PyPDFLoader)
 documents = loader.load()

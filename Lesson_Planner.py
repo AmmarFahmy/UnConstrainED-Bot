@@ -15,7 +15,7 @@ from transformers import (
 
 import os
 from dotenv import load_dotenv
-
+from langchain.chains import LLMChain
 from langchain.chat_models import ChatOpenAI
 from langchain.document_loaders import Docx2txtLoader
 
@@ -32,7 +32,10 @@ from langchain.prompts import MessagesPlaceholder
 from langchain.schema.messages import SystemMessage
 from langchain.agents import AgentExecutor
 
-llm = ChatOpenAI(openai_api_key= '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', model_name="gpt-4")
+import os
+load_dotenv()
+
+llm = ChatOpenAI(openai_api_key= os.getenv("OPENAI_API_KEY"), model_name="gpt-3.5-turbo")
 
 from langchain.embeddings import HuggingFaceEmbeddings
 
@@ -46,7 +49,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import FAISS
 from langchain.document_loaders import PyPDFLoader
 
-DATA_PATH = r"lesson-planner\resources"
+DATA_PATH = r"E:\Pycharm Projects\EPTech\UnconstrainED\lesson-planner\resources"
 
 loader = DirectoryLoader(DATA_PATH, glob='*.pdf',loader_cls=PyPDFLoader)
 documents = loader.load()
@@ -61,49 +64,36 @@ db = Chroma.from_documents(texts, embeddings)
 from langchain.prompts import PromptTemplate
 
 
-sys_prompt = """You are a helpful, respectful and honest assistant. Always answer as helpfully as possible using the context text provided. Your answers should only answer the question once and not have any text after the answer is done.
-If a question does not make any sense, or is not factually coherent, explain why, instead of answering something incorrect. If you don't know the answer to a question, say that you don't know"""
 
-instruction = """CONTEXT:/n/n {context}/n
-You are Matty, an educator's assistant dedicated to creating lesson plans.
-When you are creating the Lesson Plan, mention the following points in the answer:- 
-\n1) Teacher\n
-\n2) Date\n
-\n3) Subject Area\n
-\n4) Grade level\n
-\n5) Objective\n
-\n6) Assessment\n
-\n7) Key Points\n
-\n8) Opening\n
-\n9) Introduction to New Material\n
-\n10) Guided Practice\n
-\n11) Independent Practice\n
-\n12) Closing\n
-\n13) Extension Activity\n
-\n14) Homework\n
-\n15) Standards Addressed\n
-every point above will start from a new line in a new paragraph
-Question: {question}
+prompt_template = """
+Create a detailed lesson plan for the specified subject and topic for the specified grade level, that runs for the given duration. Consider the additional requests by the teacher when creating the lesson plan.
+Adhere to the following guidelines when creating the lesson plan:  
+1. This lesson plan will be the teacher's roadmap of what students need to learn and how it will be done effectively during class time. A successful lesson plan addresses and integrates these three key components: Objectives for student learning, teaching/learning activities, and strategies to check student understanding.
+2. The lesson plan should begin with a review of prerequisite knowledge. Alert students of the lesson goals and then present new information a little at a time.
+3. Model procedures, give clear samples, and check often to make sure students understand. Allow substantial practice with the new information. Ask lots of questions to allow students to correctly repeat or explain a procedure or concept. 
+4. It's important to represent the learning topic through a variety of examples, analogies, and connections to other knowledge. The lesson plan should anticipate and interpret student errors, represent ideas in multiple forms and develop alternative explanations.
+5. The lesson plan should specify concrete objectives for student learning and outline teaching and learning activities that will be used in class. 
+6. It will also define how the teacher will check whether the learning objectives have been accomplished. The lesson plan should include ways for teachers to check student mastery and understanding by posing questions, providing examples, and correcting misconceptions.
+7. The lesson plan should be clear about what students will learn and how they should show or demonstrate understanding of the material.
+8. You will be provided with files that offer a set of concrete suggestions that can be applied to any discipline or domain to ensure that all learners can access and participate in meaningful, challenging learning opportunities. Please use this as guidelines in creating your lesson plan.
+9. Use the Madelyn Hunter Lesson Cycle to structure your lesson plan.
 
+User Query:- {user_query}
 """
-
-
-prompt_template = instruction + sys_prompt
-PROMPT = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
+PROMPT = PromptTemplate(template=prompt_template, input_variables=["user_query"])
 
 from langchain.chains.question_answering import load_qa_chain
-llm_chain = load_qa_chain(
-    llm,
+llm_chain = LLMChain(
+    llm=llm,
     prompt=PROMPT,
     )
 
 query= "Make a lesson plan for the 4th grade Earth Science"
-# query= input()
-search_results = db.similarity_search(query, k=4)
+
 
 timeStart = time.time()
 
-result = llm_chain.run({"question": query, "input_documents": search_results})
+result = llm_chain.run(user_query= query)
 
 # print(result)
 print("Time taken: ", -timeStart + time.time())
