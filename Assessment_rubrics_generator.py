@@ -1,36 +1,10 @@
 
-
-import os
 import time
-import torch
-import pandas
-import huggingface_hub
-from transformers import (
-    AutoModelForCausalLM,
-    AutoTokenizer,
-    AutoConfig,
-    BitsAndBytesConfig,
-    pipeline,
-)
-
 import os
 from dotenv import load_dotenv
+load_dotenv()
 
 from langchain.chat_models import ChatOpenAI
-from langchain.vectorstores import Chroma
-from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-
-from langchain.agents.agent_toolkits import create_retriever_tool
-from langchain.agents.openai_functions_agent.agent_token_buffer_memory import AgentTokenBufferMemory
-
-from langchain.agents.openai_functions_agent.base import OpenAIFunctionsAgent
-
-from langchain.prompts import MessagesPlaceholder
-from langchain.schema.messages import SystemMessage
-from langchain.agents import AgentExecutor
-import os
-load_dotenv()
 
 llm = ChatOpenAI(openai_api_key= os.getenv("OPENAI_API_KEY"), model_name="gpt-4")
 
@@ -43,7 +17,6 @@ embeddings = HuggingFaceEmbeddings(model_name=model_name, model_kwargs=model_kwa
 
 from langchain.document_loaders import DirectoryLoader, Docx2txtLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.vectorstores import FAISS
 from langchain.document_loaders import PyPDFLoader
 
 DATA_PATH = r"E:\Pycharm Projects\EPTech\UnconstrainED\rubric-generator\resources"

@@ -1,11 +1,13 @@
-
 from flask import Flask, render_template, request, jsonify
 import openai
-import Lesson_Planner  
+import Lesson_Planner
+from langchain.chains import LLMChain
+from langchain_core.prompts import PromptTemplate
 import os
+from dotenv import load_dotenv
 load_dotenv()
-
 app = Flask(__name__)
+
 
 @app.route('/')
 def index():
@@ -28,22 +30,23 @@ def ask():
 
         return jsonify({'response': "Original unexpanded text for paragraph."})
 
-    # Normal query processing
-    search_results = Lesson_Planner.db.similarity_search(user_message, k=4)
-    result = Lesson_Planner.llm_chain.run({"question": user_message, "input_documents": search_results})
-    response = result  
+
+    result = Lesson_Planner.llm_chain.run(user_query= user_message)
+    response = result
 
     return jsonify({'response': response})
 
 def send_expansion_request_to_gpt4(expansion_prompt):
 
-    prompt = f"Expand the following text with real life example and incidents: \"{expansion_prompt}\""
+    prompt_template = f"Expand the following text with real life example and incidents: \"{expansion_prompt}\""
 
-    response = openai.ChatCompletion.create(
-        openai_api_key= os.getenv("OPENAI_API_KEY"),
-        model="gpt-3.5-turbo",
-        messages=[{"role": "system", "content": prompt}]
-    )
-    return response.choices[0].message['content']
+
+
+    prompt = PromptTemplate.from_template(prompt_template)
+
+    expansion_chain = LLMChain(llm=Lesson_Planner.llm, prompt=prompt)
+    response= expansion_chain.predict()
+
+    return response
 if __name__ == '__main__':
     app.run(debug=True)
