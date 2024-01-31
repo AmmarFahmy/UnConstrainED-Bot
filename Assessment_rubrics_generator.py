@@ -1,5 +1,5 @@
 
-from langchain.document_loaders import UnstructuredPowerPointLoader
+
 import os
 import time
 import torch
@@ -17,8 +17,6 @@ import os
 from dotenv import load_dotenv
 
 from langchain.chat_models import ChatOpenAI
-from langchain.document_loaders import Docx2txtLoader
-
 from langchain.vectorstores import Chroma
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
