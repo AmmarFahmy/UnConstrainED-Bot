@@ -1,5 +1,10 @@
 
 
+from langchain.prompts import PromptTemplate
+from langchain.vectorstores import Chroma
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.document_loaders import DirectoryLoader, Docx2txtLoader
+from langchain.embeddings import HuggingFaceEmbeddings
 import time
 from langchain.chains import LLMChain
 from langchain_community.chat_models import ChatOpenAI
@@ -8,31 +13,28 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-llm = ChatOpenAI(openai_api_key= os.getenv("OPENAI_API_KEY"), model_name="gpt-3.5-turbo")
+llm = ChatOpenAI(openai_api_key=os.getenv(
+    "OPENAI_API_KEY"), model_name="gpt-3.5-turbo")
 
-from langchain.embeddings import HuggingFaceEmbeddings
 
 model_name = "sentence-transformers/all-mpnet-base-v2"
 model_kwargs = {}
 
-embeddings = HuggingFaceEmbeddings(model_name=model_name, model_kwargs=model_kwargs)
-
-from langchain.document_loaders import DirectoryLoader, Docx2txtLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+embeddings = HuggingFaceEmbeddings(
+    model_name=model_name, model_kwargs=model_kwargs)
 
 
-DATA_PATH = r"E:\Pycharm Projects\EPTech\UnconstrainED\lesson-planner\resources"
+DATA_PATH = r"D:\01.VeracityGP-VeracityAI\Aistra_works\UnConstrainED-Bot\lesson-planner\resources"
 
-loader = DirectoryLoader(DATA_PATH, glob='*.pdf',loader_cls=PyPDFLoader)
+loader = DirectoryLoader(DATA_PATH, glob='*.pdf', loader_cls=PyPDFLoader)
 documents = loader.load()
-text_splitter = RecursiveCharacterTextSplitter(chunk_size=1300, chunk_overlap=130)
+text_splitter = RecursiveCharacterTextSplitter(
+    chunk_size=1300, chunk_overlap=130)
 texts = text_splitter.split_documents(documents)
 
-from langchain.vectorstores import Chroma
 # load it into Chroma
 db = Chroma.from_documents(texts, embeddings)
 
-from langchain.prompts import PromptTemplate
 
 prompt_template = """
 Create a detailed lesson plan for the specified subject and topic for the specified grade level, that runs for the given duration. Consider the additional requests by the teacher when creating the lesson plan.
@@ -49,19 +51,20 @@ Adhere to the following guidelines when creating the lesson plan:
 
 User Query:- {user_query}
 """
-PROMPT = PromptTemplate(template=prompt_template, input_variables=["user_query"])
+PROMPT = PromptTemplate(template=prompt_template,
+                        input_variables=["user_query"])
 
 llm_chain = LLMChain(
     llm=llm,
     prompt=PROMPT,
-    )
+)
 
-query= "Make a lesson plan for the 4th grade Earth Science"
+query = "Make a lesson plan for the 4th grade Earth Science"
 
 
 timeStart = time.time()
 
-result = llm_chain.run(user_query= query)
+result = llm_chain.run(user_query=query)
 
 # print(result)
 print("Time taken: ", -timeStart + time.time())
